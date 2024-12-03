@@ -1,0 +1,30 @@
+package dao
+
+import (
+	"database/sql"
+)
+
+var Db *sql.DB
+
+func ConnectDB() error {
+	dsn := "root:123456@tcp(127.0.0.1:3306)/message_board?charset=utf8mb4&parseTime=True&loc=Local&timeout=30s"
+	//第一部分：连接数据库，并检测其连接正常性
+	var err error
+	Db, err = sql.Open("mysql", dsn) //链接数据库
+	if err != nil {
+		return err
+	}
+	err = Db.Ping()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DisconnectDB() {
+	if Db != nil {
+		err := Db.Close()
+		if err != nil {
+		}
+	}
+}
