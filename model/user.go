@@ -3,11 +3,11 @@ package model
 import "time"
 
 type User struct {
-	ID        int       `json:"ID"`
-	NickName  string    `json:"NickName"`
-	UserName  string    `json:"UserName"`
-	PassWord  string    `json:"PassWord"`
-	CreatedAt time.Time `json:"CreatedAt"`
-	UpdatedAt time.Time `json:"UpdatedAt"`
-	Role      string    `json:"Role"`
+	ID        int       `json:"id"`
+	NickName  string    `json:"nickname"`
+	UserName  string    `json:"username"`
+	PassWord  string    `json:"password"`
+	CreatedAt time.Time `json:"created-at"`
+	UpdatedAt time.Time `json:"updated-at"`
+	Role      string    `json:"role"`
 }
