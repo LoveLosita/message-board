@@ -1,7 +1,16 @@
 package service
 
-func SendComment() {
+import (
+	"message-board/dao"
+	"message-board/model"
+)
 
+func SendComment(message model.Message) error {
+	err := dao.AddComment(message)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetAllComments() {

@@ -3,13 +3,31 @@ package api
 import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"message-board/model"
+	"message-board/service"
 )
 
-// 这些都是管理员专属功能
-
 func SendComment(ctx context.Context, c *app.RequestContext) {
-
+	message := model.Message{}
+	err := c.BindJSON(&message)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	err = service.SendComment(message)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	c.JSON(consts.StatusOK, map[string]string{
+		"status": "success",
+	})
 }
+
+// 下面都是管理员专属功能
 
 func GetAllComments(ctx context.Context, c *app.RequestContext) {
 
