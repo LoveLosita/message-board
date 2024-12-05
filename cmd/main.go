@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"message-board/api"
 	"message-board/dao"
+	"message-board/router"
 )
 
 func main() {
@@ -11,5 +11,5 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	api.RegisterRouters() //注册路由并启动服务
+	router.RegisterRouters() //注册路由并启动服务
 }
