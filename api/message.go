@@ -14,10 +14,12 @@ func SendComment(ctx context.Context, c *app.RequestContext) {
 	err := c.BindJSON(&message)
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.CustomError(err))
+		return
 	}
 	err = service.SendComment(message)
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.CustomError(err))
+		return
 	}
 	c.JSON(consts.StatusOK, utils.Ok)
 }
@@ -28,12 +30,24 @@ func GetAllComments(ctx context.Context, c *app.RequestContext) {
 	allComments, err := service.GetAllComments()
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.CustomError(err))
+		return
 	}
 	c.JSON(consts.StatusOK, allComments)
 }
 
 func DeleteComment(ctx context.Context, c *app.RequestContext) {
-
+	messageToDelete := model.Message{}
+	err := c.BindJSON(&messageToDelete)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.CustomError(err))
+		return
+	}
+	err = service.DeleteComment(messageToDelete)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.CustomError(err))
+		return
+	}
+	c.JSON(consts.StatusOK, utils.CustomSuccess("message deleted successfully"))
 }
 
 func SearchForComments(ctx context.Context, c *app.RequestContext) { //后期再添加的功能

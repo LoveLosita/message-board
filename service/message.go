@@ -22,8 +22,12 @@ func GetAllComments() ([]model.Message, error) {
 	return commentList, nil
 }
 
-func DeleteComment() {
-
+func DeleteComment(message model.Message) error { //此处传结构体是为之后更新任意条件查找并删除做准备
+	err := dao.DeleteComment(message)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func SearchForComments() { //后期再添加的功能

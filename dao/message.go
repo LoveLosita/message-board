@@ -24,19 +24,39 @@ func GetComment() ([]model.Message, error) {
 	if err = rows.Err(); err != nil {
 		return empty, err
 	}
-	fmt.Println(commentList)
 	return commentList, nil
 }
 
 func AddComment(message model.Message) error {
-	query := "INSERT INTO messages (user_id,content) VALUES (?,?)"
-	_, err := Db.Exec(query, message.UserID, message.Content)
+	query := "SELECT * FROM users WHERE id=?"
+	rows, err := Db.Query(query, message.UserID)
+	if err != nil {
+		return err
+	}
+	if !rows.Next() {
+		return fmt.Errorf("invalid userid")
+	}
+	query = "INSERT INTO messages (user_id,content) VALUES (?,?)"
+	_, err = Db.Exec(query, message.UserID, message.Content)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func DeleteComment() {
-
+func DeleteComment(messageInfo model.Message) error {
+	query := "UPDATE messages SET is_deleted=1 WHERE id = ?"
+	result, err := Db.Exec(query, messageInfo.ID)
+	if err != nil {
+		return err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return fmt.Errorf("can't find this message")
+	} else {
+		return nil
+	}
 }
