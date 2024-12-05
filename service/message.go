@@ -13,8 +13,13 @@ func SendComment(message model.Message) error {
 	return nil
 }
 
-func GetAllComments() {
-
+func GetAllComments() ([]model.Message, error) {
+	var commentList []model.Message
+	commentList, err := dao.GetComment()
+	if err != nil {
+		return nil, err
+	}
+	return commentList, nil
 }
 
 func DeleteComment() {

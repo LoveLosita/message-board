@@ -25,7 +25,11 @@ func SendComment(ctx context.Context, c *app.RequestContext) {
 // 下面都是管理员专属功能
 
 func GetAllComments(ctx context.Context, c *app.RequestContext) {
-
+	allComments, err := service.GetAllComments()
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.CustomError(err))
+	}
+	c.JSON(consts.StatusOK, allComments)
 }
 
 func DeleteComment(ctx context.Context, c *app.RequestContext) {

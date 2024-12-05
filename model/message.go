@@ -9,5 +9,5 @@ type Message struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated-at"`
 	IsDeleted int       `json:"is_deleted"`
-	ParentID  int       `json:"parent_id"`
+	ParentID  *int      `json:"parent_id"`
 }
