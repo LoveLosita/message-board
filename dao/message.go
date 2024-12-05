@@ -1,11 +1,11 @@
 package dao
 
 import (
-	"fmt"
 	"message-board/model"
+	"message-board/utils"
 )
 
-func GetComment() ([]model.Message, error) {
+func GetAllComment() ([]model.Message, error) {
 	var empty []model.Message
 	var commentList []model.Message
 	var comment model.Message
@@ -29,12 +29,12 @@ func GetComment() ([]model.Message, error) {
 
 func AddComment(message model.Message) error {
 	query := "SELECT * FROM users WHERE id=?"
-	rows, err := Db.Query(query, message.UserID)
+	rows, err := Db.Query(query, message.UserID) //内部错误
 	if err != nil {
 		return err
 	}
-	if !rows.Next() {
-		return fmt.Errorf("invalid userid")
+	if !rows.Next() { //参数错误
+		return utils.InvalidID
 	}
 	query = "INSERT INTO messages (user_id,content) VALUES (?,?)"
 	_, err = Db.Exec(query, message.UserID, message.Content)
@@ -55,7 +55,7 @@ func DeleteComment(messageInfo model.Message) error {
 		return err
 	}
 	if affected == 0 {
-		return fmt.Errorf("can't find this message")
+		return utils.CantFindMessage
 	} else {
 		return nil
 	}

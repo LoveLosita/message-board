@@ -15,7 +15,7 @@ func SendComment(message model.Message) error {
 
 func GetAllComments() ([]model.Message, error) {
 	var commentList []model.Message
-	commentList, err := dao.GetComment()
+	commentList, err := dao.GetAllComment()
 	if err != nil {
 		return nil, err
 	}

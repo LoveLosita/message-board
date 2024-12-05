@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"fmt"
 	"message-board/model"
+	"message-board/utils"
 )
 
 func GetUserInfo(name string) (model.User, error) {
@@ -19,7 +19,7 @@ func GetUserInfo(name string) (model.User, error) {
 		}
 		return user, nil
 	} else {
-		return model.User{}, fmt.Errorf("wrong-username")
+		return model.User{}, utils.WrongUsrName
 	}
 }
 
