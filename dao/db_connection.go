@@ -21,11 +21,3 @@ func ConnectDB() error {
 	}
 	return nil
 }
-
-func DisconnectDB() {
-	if Db != nil {
-		err := Db.Close()
-		if err != nil {
-		}
-	}
-}

@@ -11,6 +11,5 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	api.RegisterRouters()    //注册路由并启动服务
-	defer dao.DisconnectDB() //在退出时断开数据库连接
+	api.RegisterRouters() //注册路由并启动服务
 }
