@@ -1,5 +1,7 @@
 package utils
 
+import "errors"
+
 type Response struct {
 	Status int    `json:"status"`
 	Info   string `json:"info"`
@@ -11,21 +13,33 @@ var (
 		Info:   "OK",
 	}
 	WrongPwd = Response{
-		Status: 404,
+		Status: 400,
 		Info:   "Wrong Password!",
 	}
+	InvalidID       = errors.New("invalid userid")
+	CantFindMessage = errors.New("can't find this message")
+	WrongUsrName    = errors.New("wrong username")
+	InvalidUsername = errors.New("invalid username")
+	MissingParam    = errors.New("more params needed")
 )
 
-func CustomError(err error) Response {
+func ServerError(err error) Response {
 	return Response{
-		Status: 404,
+		Status: 500,
 		Info:   err.Error(),
 	}
 }
 
-func CustomSuccess(message string) Response {
+func ClientError(err error) Response {
 	return Response{
-		Status: 200,
-		Info:   message,
+		Status: 400,
+		Info:   err.Error(),
+	}
+}
+
+func NotFoundError(err error) Response {
+	return Response{
+		Status: 404,
+		Info:   err.Error(),
 	}
 }
