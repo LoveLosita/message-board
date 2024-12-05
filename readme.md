@@ -39,7 +39,7 @@
    |--------|------|
    |用户名 | username  |
    | 密码   | password   |
-   | 权限| role   |
+   | 权限| role (包括"admin"和"user")   |
    |匿名|nickname|
 5. **请求示例：**
     ```json
