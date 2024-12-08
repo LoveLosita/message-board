@@ -16,11 +16,16 @@ var (
 		Status: 400,
 		Info:   "Wrong Password!",
 	}
-	InvalidID       = errors.New("invalid userid")
-	CantFindMessage = errors.New("can't find this message")
-	WrongUsrName    = errors.New("wrong username")
-	InvalidUsername = errors.New("invalid username")
-	MissingParam    = errors.New("more params needed")
+	InvalidID                 = errors.New("invalid userid")
+	CantFindMessage           = errors.New("can't find this message")
+	WrongUsrName              = errors.New("wrong username")
+	InvalidUsername           = errors.New("invalid username")
+	MissingParam              = errors.New("more params needed")
+	MissingToken              = errors.New("missing token")
+	InvalidTokenSingingMethod = errors.New("invalid signing method")
+	InvalidToken              = errors.New("invalid token")
+	InvalidClaims             = errors.New("invalid claims")
+	NotLoggedIn               = errors.New("not logged in")
 )
 
 func ServerError(err error) Response {
