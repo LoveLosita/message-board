@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"message-board/model"
@@ -17,6 +18,13 @@ func SendComment(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
 		return
 	}
+	getID := c.GetFloat64("user_id") //从上下文中获取用户的id
+	if getID == 0 {                  //id空白，表示未登录，不过一般在中间件就会被截止了
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.NotLoggedIn))
+	}
+	id := int(getID)
+	fmt.Println(id)
+	message.UserID = id
 	err = service.SendComment(message)
 	if err != nil {
 		switch {
