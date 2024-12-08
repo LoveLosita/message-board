@@ -18,7 +18,8 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	result := false
-	result, err = service.UserLogin(postUser.UserName, postUser.PassWord) //调用用户登录模块
+	userID := 0
+	userID, result, err = service.UserLogin(postUser.UserName, postUser.PassWord) //调用用户登录模块
 	if err != nil {
 		switch {
 		case errors.Is(err, utils.WrongUsrName): //用户名错误
@@ -29,7 +30,16 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	if result {
-		c.JSON(consts.StatusOK, utils.Ok)
+		// 创建 JWT
+		strJWT, err := service.GenerateJWT(userID)
+		if err != nil {
+			c.JSON(consts.StatusBadRequest, utils.ClientError(err))
+		}
+		combinedJson := map[string]interface{}{
+			"token":    strJWT,
+			"response": utils.Ok,
+		}
+		c.JSON(consts.StatusOK, combinedJson)
 	} else {
 		c.JSON(consts.StatusBadRequest, utils.WrongPwd) //密码错误
 	}

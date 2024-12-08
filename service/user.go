@@ -6,15 +6,15 @@ import (
 	"message-board/utils"
 )
 
-func UserLogin(username string, password string) (bool, error) {
+func UserLogin(username string, password string) (int, bool, error) {
 	daoUser, err := dao.GetUserInfo(username)
 	if err != nil { //找不到用户名或者内部错误
-		return false, err
+		return 0, false, err
 	}
 	if password == daoUser.PassWord {
-		return true, nil
+		return daoUser.ID, true, nil
 	} else {
-		return false, nil //密码错误
+		return 0, false, nil //密码错误
 	}
 }
 
