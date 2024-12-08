@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"message-board/api"
+	"message-board/middleware"
 )
 
 func RegisterRouters() {
@@ -15,7 +16,7 @@ func RegisterRouters() {
 
 	messageGroup := h.Group("/message") //创建留言组
 
-	messageGroup.POST("/submit", api.SendComment) //message->submit
+	messageGroup.POST("/submit", middleware.JWTAuthMiddleware(), api.SendComment) //message->submit
 
 	adminGroup := h.Group("/admin")                 //创建管理组
 	messageSubGroup := adminGroup.Group("/message") //创建管理->留言组
