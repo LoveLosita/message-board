@@ -33,7 +33,7 @@ func JWTAuthMiddleware() app.HandlerFunc {
 			}
 			return jwtSecret, nil
 		})
-		if err != nil || !token.Valid {
+		if err != nil || !token.Valid { //token无效
 			c.JSON(http.StatusUnauthorized, map[string]string{
 				"error": utils.InvalidToken.Error(),
 			})
@@ -44,8 +44,8 @@ func JWTAuthMiddleware() app.HandlerFunc {
 		// 将解析出的用户信息存入上下文，供后续使用
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("user_id", claims["user_id"])
-			fmt.Printf("%T", claims["user_id"])
-			fmt.Println("Claims:", claims) // 打印出所有解析到的 claims
+			//fmt.Printf("%T", claims["user_id"])//测试用
+			//fmt.Println("Claims:", claims) // 打印出所有解析到的 claims//测试用
 		} else {
 			c.JSON(http.StatusUnauthorized, map[string]string{
 				"error": utils.InvalidClaims.Error(),
