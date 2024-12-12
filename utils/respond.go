@@ -18,6 +18,7 @@ var (
 	}
 	InvalidID                 = errors.New("invalid userid")
 	CantFindMessage           = errors.New("can't find this message")
+	CantFindUser              = errors.New("can't find this user")
 	WrongUsrName              = errors.New("wrong username")
 	InvalidUsername           = errors.New("invalid username")
 	MissingParam              = errors.New("more params needed")
@@ -26,6 +27,7 @@ var (
 	InvalidToken              = errors.New("invalid token")
 	InvalidClaims             = errors.New("invalid claims")
 	NotLoggedIn               = errors.New("not logged in")
+	ErrUnauthorized           = errors.New("unauthorized: only admins can perform this action")
 )
 
 func ServerError(err error) Response {

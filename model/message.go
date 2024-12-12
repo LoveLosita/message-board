@@ -11,3 +11,10 @@ type Message struct {
 	IsDeleted int       `json:"is_deleted"`
 	ParentID  *int      `json:"parent_id"`
 }
+
+type SearchParams struct { //定义一个结构体，用于接收前端传来的参数
+	CommentID int    `json:"comment_id"`
+	Content   string `json:"content"`
+	UserID    int    `json:"user_id"`
+	Username  string `json:"username"`
+}
