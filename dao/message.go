@@ -6,7 +6,7 @@ import (
 	"message-board/utils"
 )
 
-func GetAllComment() ([]model.Message, error) { //获取所有评论
+func GetAllMessages() ([]model.Message, error) { //获取所有评论
 	var empty []model.Message                              //空的返回值
 	var commentList []model.Message                        //返回的评论列表
 	var comment model.Message                              //单个评论
@@ -29,7 +29,7 @@ func GetAllComment() ([]model.Message, error) { //获取所有评论
 	return commentList, nil //返回查询结果
 }
 
-func AddComment(message model.Message) error { //发送评论
+func AddMessage(message model.Message) error { //发送评论
 	query := "SELECT * FROM users WHERE id=?"    //查询语句
 	rows, err := Db.Query(query, message.UserID) //内部错误
 	if err != nil {                              //如果查询出错，那么返回错误
@@ -46,7 +46,7 @@ func AddComment(message model.Message) error { //发送评论
 	return nil
 }
 
-func DeleteComment(msgID int) error {
+func DeleteMessage(msgID int) error {
 	query := "UPDATE messages SET is_deleted=1 WHERE id = ?"
 	result, err := Db.Exec(query, msgID)
 	if err != nil {
@@ -63,7 +63,7 @@ func DeleteComment(msgID int) error {
 	}
 }
 
-func SearchForComments(commentID int, content string, userID int, username string) ([]model.Message, error) {
+func SearchForMessages(commentID int, content string, userID int, username string) ([]model.Message, error) {
 	var empty []model.Message       //空的返回值
 	var commentList []model.Message //返回的评论列表
 	var comment model.Message       //单个评论

@@ -8,7 +8,7 @@ import (
 )
 
 func SendComment(message model.Message) error { //发送评论
-	err := dao.AddComment(message) //调用dao层函数
+	err := dao.AddMessage(message) //调用dao层函数
 	if err != nil {
 		return err
 	}
@@ -24,8 +24,8 @@ func GetAllComments(handlerID int) ([]model.Message, error) { //获取所有评�
 	if !result {
 		return empty, utils.ErrUnauthorized //不是管理员，返回错误
 	}
-	var commentList []model.Message        //定义一个空的评论列表
-	commentList, err = dao.GetAllComment() //调用dao层函数
+	var commentList []model.Message         //定义一个空的评论列表
+	commentList, err = dao.GetAllMessages() //调用dao层函数
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func DeleteComment(msgID int, handlerID int) error { //删除评论
 	if !result {
 		return utils.ErrUnauthorized //不是管理员，返回错误
 	}
-	err = dao.DeleteComment(msgID) //调用dao层函数
+	err = dao.DeleteMessage(msgID) //调用dao层函数
 	if err != nil {
 		return err
 	}
@@ -55,5 +55,5 @@ func SearchForComments(commentID int, content string, userID int, username strin
 	if !result {
 		return nil, utils.ErrUnauthorized //不是管理员，返回错误
 	}
-	return dao.SearchForComments(commentID, content, userID, username) //是管理员，调用dao层函数
+	return dao.SearchForMessages(commentID, content, userID, username) //是管理员，调用dao层函数
 }
