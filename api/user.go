@@ -54,6 +54,10 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
 		return
 	}
+	if user.UserName == "" || user.PassWord == "" || user.NickName == "" { //缺少参数
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.MissingParam))
+		return
+	}
 	err = service.UserRegister(user) //调用用户注册函数，传入用户数据完成注册
 	if err != nil {
 		if errors.Is(err, utils.MissingParam) || errors.Is(err, utils.InvalidUsername) { //客户端原因的错误
@@ -73,6 +77,10 @@ func ShowUserInfo(ctx context.Context, c *app.RequestContext) { //后期再添�
 	err := c.BindJSON(&inquireJson)    //解析json
 	if err != nil {                    //解析失败
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
+		return
+	}
+	if inquireJson.UserName == "" && inquireJson.UserID == 0 { //缺少参数
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.MissingParam))
 		return
 	}
 	handlerID := int(c.GetFloat64("user_id"))                                              //获取用户ID

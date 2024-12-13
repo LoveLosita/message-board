@@ -1,12 +1,14 @@
 package auth
 
 import (
+	"fmt"
 	"message-board/dao"
 	"message-board/utils"
 )
 
 func CheckPermission(handlerID int) (bool, error) { // 检查用户权限
 	user, err := dao.GetUserInfoByID(handlerID) //通过handlerID获取用户信息
+	fmt.Println(handlerID)
 	if err != nil {
 		return false, err
 	}

@@ -19,6 +19,10 @@ func SendComment(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
 		return
 	}
+	if message.Content == "" {
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.MissingParam))
+		return
+	}
 	getID := c.GetFloat64("user_id") //从上下文中获取用户的id
 	if getID == 0 {                  //id空白，表示未登录，不过一般在中间件就会被截止了
 		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.NotLoggedIn))
@@ -58,6 +62,10 @@ func GetAllComments(ctx context.Context, c *app.RequestContext) { //获取所有
 func DeleteComment(ctx context.Context, c *app.RequestContext) { //管理员专属功能,传入ID以删除评论
 	messageID := c.Query("id")
 	handlerID := int(c.GetFloat64("user_id"))
+	if messageID == "" { //如果没有传入ID，那么返回错误，避免下方的转换出错
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.MissingParam))
+		return
+	}
 	intMsgID, err := strconv.ParseInt(messageID, 10, 0)
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
@@ -90,10 +98,8 @@ func SearchForComments(ctx context.Context, c *app.RequestContext) { //管理员
 		searchParams.Username, int(handlerID)) //调用service层的方法，进行查询
 	if err != nil {
 		switch {
-		case errors.Is(err, utils.MissingParam): //参数不足
+		case errors.Is(err, utils.MissingParam), errors.Is(err, utils.ErrUnauthorized), errors.Is(err, utils.InvalidID), errors.Is(err, utils.CantFindMessage): //参数不足
 			c.JSON(consts.StatusBadRequest, utils.ClientError(err))
-		case errors.Is(err, utils.ErrUnauthorized): //权限不足
-			c.JSON(consts.StatusUnauthorized, utils.ClientError(err))
 		default: //其他错误
 			c.JSON(consts.StatusInternalServerError, utils.ServerError(err))
 		}

@@ -89,6 +89,9 @@ func SearchForComments(commentID int, content string, userID int, username strin
 	if err != nil { //如果查询出错，那么返回空值和错误
 		return empty, err
 	}
+	if !rows.Next() { //如果找不到评论，那么返回空值和错误
+		return empty, utils.CantFindMessage
+	}
 	for rows.Next() { //遍历查询结果
 		err = rows.Scan(&comment.ID, &comment.UserID, &comment.Content, &comment.CreatedAt, &comment.UpdatedAt, &comment.IsDeleted, &comment.ParentID)
 		if err != nil {
