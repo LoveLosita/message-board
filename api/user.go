@@ -12,7 +12,7 @@ import (
 	"strconv"
 )
 
-func UserLogin(ctx context.Context, c *app.RequestContext) {
+func UserLogin(ctx context.Context, c *app.RequestContext) { //用户登录
 	postUser := model.User{}
 	err := c.BindJSON(&postUser)
 	if err != nil {
@@ -33,7 +33,7 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	}
 	if result {
 		// 创建 JWT
-		strJWT, err := auth.GenerateJWT(userID)
+		strJWT, err := auth.GenerateJWT(userID) //生成JWT
 		if err != nil {
 			c.JSON(consts.StatusBadRequest, utils.ClientError(err))
 		}
@@ -108,7 +108,7 @@ func ChangeUserInfo(ctx context.Context, c *app.RequestContext) { //后期再添
 	err = service.ChangeUserInfo(handlerID, jsonUser) //调用service层的方法，修改用户信息
 	if err != nil {
 		switch {
-		case errors.Is(err, utils.ErrUnauthorized):
+		case errors.Is(err, utils.SameInfoAsBefore), errors.Is(err, utils.ErrUnauthorized), errors.Is(err, utils.InvalidID):
 			c.JSON(consts.StatusBadRequest, utils.ClientError(err))
 		default:
 			c.JSON(consts.StatusInternalServerError, utils.ServerError(err))

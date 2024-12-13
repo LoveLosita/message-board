@@ -73,6 +73,10 @@ func ChangeUserInfo(handlerID int, user model.NewUser) error {
 	if err != nil {
 		return err
 	}
+	if currentUser.UserName == user.UserName || currentUser.NickName == user.NickName || //如果新信息和旧信息相同，那么就不修改
+		currentUser.PassWord == user.PassWord || currentUser.Role == user.Role {
+		return utils.SameInfoAsBefore
+	}
 	if user.UserName == "" { //如果用户名为空，那么就不修改用户名
 		user.UserName = currentUser.UserName
 	}
