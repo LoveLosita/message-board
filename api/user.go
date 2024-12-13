@@ -130,7 +130,7 @@ func DeleteUser(ctx context.Context, c *app.RequestContext) { //后期再添加�
 	handlerID := int(c.GetFloat64("user_id")) //获取用户ID
 	targetID := c.Query("id")
 	if targetID == "" { //缺少参数
-		c.JSON(consts.StatusBadRequest, utils.MissingParam)
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.MissingParam))
 		return
 	}
 	intTargetID, err := strconv.ParseInt(targetID, 10, 0) //解析参数
@@ -141,7 +141,7 @@ func DeleteUser(ctx context.Context, c *app.RequestContext) { //后期再添加�
 	err = service.DeleteUser(int(intTargetID), handlerID) //调用service层的方法，删除用户
 	if err != nil {
 		switch {
-		case errors.Is(err, utils.ErrUnauthorized): //不是管理员，无法删除
+		case errors.Is(err, utils.ErrUnauthorized), errors.Is(err, utils.CantFindUser): //不是管理员，无法删除
 			c.JSON(consts.StatusBadRequest, utils.ClientError(err)) //返回错误
 		default:
 			c.JSON(consts.StatusInternalServerError, utils.ServerError(err)) //内部错误

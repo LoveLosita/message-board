@@ -1,6 +1,6 @@
 # 接口文档
-根目录里面的`api.md`就是接口文档。
-- [api.md](https://f3px86u2dx.apifox.cn/)
+现在改用apifox生成效果更好、减轻我负担的接口文档。
+- 链接：[api.md](https://f3px86u2dx.apifox.cn/){:target="\_blank"}
 # 1.项目基本介绍
 本项目为一个简单的留言板的后端部分，可以实现用户注册、登录、发表留言、获取所有留言、
 删除留言等功能。
