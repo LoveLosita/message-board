@@ -10,6 +10,7 @@ type Message struct {
 	UpdatedAt time.Time `json:"updated-at"`
 	IsDeleted int       `json:"is_deleted"`
 	ParentID  *int      `json:"parent_id"`
+	Likes     int       `json:"likes"`
 }
 
 type SearchParams struct { //定义一个结构体，用于接收前端传来的参数

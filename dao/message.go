@@ -17,7 +17,7 @@ func GetAllMessages() ([]model.Message, error) { //获取所有评论
 	}
 	for rows.Next() { //遍历查询结果
 		err = rows.Scan(&comment.ID, &comment.UserID, &comment.Content, &comment.CreatedAt, &comment.UpdatedAt,
-			&comment.IsDeleted, &comment.ParentID) //将查询结果赋值给comment
+			&comment.IsDeleted, &comment.ParentID, &comment.Likes) //将查询结果赋值给comment
 		if err != nil { //如果遍历出错，那么返回空值和错误
 			return empty, err
 		}
@@ -93,7 +93,7 @@ func SearchForMessages(commentID int, content string, userID int, username strin
 		return empty, utils.CantFindMessage
 	}
 	for rows.Next() { //遍历查询结果
-		err = rows.Scan(&comment.ID, &comment.UserID, &comment.Content, &comment.CreatedAt, &comment.UpdatedAt, &comment.IsDeleted, &comment.ParentID)
+		err = rows.Scan(&comment.ID, &comment.UserID, &comment.Content, &comment.CreatedAt, &comment.UpdatedAt, &comment.IsDeleted, &comment.ParentID, &comment.Likes) //将查询结果赋值给comment
 		if err != nil {
 			return empty, err
 		}
