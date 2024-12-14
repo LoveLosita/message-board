@@ -31,6 +31,8 @@ var (
 	SameInfoAsBefore          = errors.New("the new info is the same as before")                //要修改的新信息与原信息相同
 	SamePassword              = errors.New("the new password is the same as before")            //新密码与原密码相同
 	WrongOldPassword          = errors.New("wrong old password")                                //旧密码错误
+	MessageAlreadyLiked       = errors.New("you've already liked this message")                 //已经点赞过了
+	MessageNotLiked           = errors.New("you haven't liked this message")                    //没有点赞过
 )
 
 func ServerError(err error) Response { //服务器错误

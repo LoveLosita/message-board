@@ -63,7 +63,7 @@ func DeleteMessage(msgID int) error {
 	}
 }
 
-func SearchForMessages(commentID int, content string, userID int, username string) ([]model.Message, error) {
+func SearchForMessages(commentID int, content string, userID int, username string) ([]model.Message, error) { //搜索评论
 	var empty []model.Message       //空的返回值
 	var commentList []model.Message //返回的评论列表
 	var comment model.Message       //单个评论
@@ -103,4 +103,79 @@ func SearchForMessages(commentID int, content string, userID int, username strin
 		return empty, err
 	}
 	return commentList, nil
+}
+
+func LikeMessage(messageID int, userID int) error { //点赞
+	query := "INSERT INTO likes (beliked_message_id,like_user_id) VALUES (?,?)" //插入点赞
+	_, err := Db.Exec(query, messageID, userID)                                 //执行插入
+	if err != nil {
+		return err
+	}
+	query = "UPDATE messages SET `like` = `like` + 1 WHERE id = ?"
+	result, err := Db.Exec(query, messageID)
+	if err != nil {
+		return err
+	}
+	affected, err := result.RowsAffected() //返回受影响的行数
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return utils.CantFindMessage //找不到评论
+	}
+	return nil
+}
+
+func IfYouLikedThisMessage(messageID int, userID int) (bool, error) {
+	query := "SELECT * FROM likes WHERE beliked_message_id = ? AND like_user_id = ?" //查询语句
+	rows, err := Db.Query(query, messageID, userID)
+	if err != nil {
+		return true, err
+	}
+	if rows.Next() {
+		return true, nil
+	}
+	return false, err
+}
+
+func IfMessageExists(messageID int) (bool, error) {
+	query := "SELECT * FROM messages WHERE id = ?"
+	rows, err := Db.Query(query, messageID)
+	if err != nil {
+		return true, err
+	}
+	if rows.Next() {
+		return true, nil
+	}
+	return false, err
+}
+
+func DislikeMessage(messageID int, userID int) error {
+	//第一步，删除点赞记录
+	query := "DELETE FROM likes WHERE beliked_message_id = ? AND like_user_id = ?"
+	result, err := Db.Exec(query, messageID, userID)
+	if err != nil {
+		return err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return utils.CantFindMessage
+	}
+	//第二步，更新点赞数
+	query = "UPDATE messages SET `like` = `like` - 1 WHERE id = ?"
+	result, err = Db.Exec(query, messageID)
+	if err != nil {
+		return err
+	}
+	affected, err = result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return utils.CantFindMessage
+	}
+	return nil
 }

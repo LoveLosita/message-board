@@ -12,7 +12,7 @@ import (
 	"strconv"
 )
 
-func SendComment(ctx context.Context, c *app.RequestContext) {
+func SendMessage(ctx context.Context, c *app.RequestContext) {
 	message := model.Message{}
 	err := c.BindJSON(&message)
 	if err != nil {
@@ -30,7 +30,7 @@ func SendComment(ctx context.Context, c *app.RequestContext) {
 	id := int(getID)
 	fmt.Println(id)
 	message.UserID = id
-	err = service.SendComment(message)
+	err = service.SendMessage(message)
 	if err != nil {
 		switch {
 		case errors.Is(err, utils.InvalidID):
@@ -45,9 +45,9 @@ func SendComment(ctx context.Context, c *app.RequestContext) {
 
 // 下面都是管理员专属功能
 
-func GetAllComments(ctx context.Context, c *app.RequestContext) { //获取所有评论
+func GetAllMessages(ctx context.Context, c *app.RequestContext) { //获取所有评论
 	handlerID := int(c.GetFloat64("user_id"))             //从上下文中获取用户的id
-	allComments, err := service.GetAllComments(handlerID) //调用service层的方法，获取所有评论
+	allComments, err := service.GetAllMessages(handlerID) //调用service层的方法，获取所有评论
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, utils.ServerError(err)) //如果出错，说明是服务器错误，返回500
 		return
@@ -59,7 +59,7 @@ func GetAllComments(ctx context.Context, c *app.RequestContext) { //获取所有
 	c.JSON(consts.StatusOK, combinedJson) //返回所有评论和状态码
 }
 
-func DeleteComment(ctx context.Context, c *app.RequestContext) { //管理员专属功能,传入ID以删除评论
+func DeleteMessage(ctx context.Context, c *app.RequestContext) { //管理员专属功能,传入ID以删除评论
 	messageID := c.Query("id")
 	handlerID := int(c.GetFloat64("user_id"))
 	if messageID == "" { //如果没有传入ID，那么返回错误，避免下方的转换出错
@@ -71,7 +71,7 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) { //管理员专�
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
 		return
 	}
-	err = service.DeleteComment(int(intMsgID), handlerID) //调用service层的方法，并传入ID进行管理员身份验证，然后删除
+	err = service.DeleteMessages(int(intMsgID), handlerID) //调用service层的方法，并传入ID进行管理员身份验证，然后删除
 	if err != nil {
 		switch {
 		case errors.Is(err, utils.CantFindMessage):
@@ -86,7 +86,7 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) { //管理员专�
 	c.JSON(consts.StatusOK, utils.Ok)
 }
 
-func SearchForComments(ctx context.Context, c *app.RequestContext) { //管理员专属功能
+func SearchForMessages(ctx context.Context, c *app.RequestContext) { //管理员专属功能
 	searchParams := model.SearchParams{}
 	handlerID := c.GetFloat64("user_id") //从上下文中获取用户的id
 	err := c.BindJSON(&searchParams)     //绑定前端传来的参数
@@ -94,7 +94,7 @@ func SearchForComments(ctx context.Context, c *app.RequestContext) { //管理员
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err)) //参数错误
 		return
 	}
-	comments, err := service.SearchForComments(searchParams.CommentID, searchParams.Content, searchParams.UserID,
+	comments, err := service.SearchForMessages(searchParams.CommentID, searchParams.Content, searchParams.UserID,
 		searchParams.Username, int(handlerID)) //调用service层的方法，进行查询
 	if err != nil {
 		switch {
@@ -110,4 +110,56 @@ func SearchForComments(ctx context.Context, c *app.RequestContext) { //管理员
 		"respond code": utils.Ok,
 	}
 	c.JSON(consts.StatusOK, combinedJson) //返回查询结果
+}
+
+func LikeMessage(ctx context.Context, c *app.RequestContext) {
+	messageID := c.Query("id")
+	if messageID == "" {
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.MissingParam))
+		return
+	}
+	intMessageID, err := strconv.ParseInt(messageID, 10, 0)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
+		return
+	}
+	handlerID := int(c.GetFloat64("user_id")) //从上下文中获取用户的id
+	err = service.LikeMessage(int(intMessageID), handlerID)
+	if err != nil {
+		switch {
+		case errors.Is(err, utils.CantFindMessage), errors.Is(err, utils.MessageAlreadyLiked):
+			c.JSON(consts.StatusBadRequest, utils.ClientError(utils.CantFindMessage))
+			return
+		default:
+			c.JSON(consts.StatusInternalServerError, utils.ServerError(err))
+			return
+		}
+	}
+	c.JSON(consts.StatusOK, utils.Ok)
+}
+
+func DislikeMessage(ctx context.Context, c *app.RequestContext) {
+	messageID := c.Query("id")
+	if messageID == "" {
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.MissingParam))
+		return
+	}
+	intMessageID, err := strconv.ParseInt(messageID, 10, 0)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
+		return
+	}
+	handlerID := int(c.GetFloat64("user_id")) //从上下文中获取用户的id
+	err = service.DislikeMessage(int(intMessageID), handlerID)
+	if err != nil {
+		switch {
+		case errors.Is(err, utils.CantFindMessage), errors.Is(err, utils.MessageNotLiked):
+			c.JSON(consts.StatusBadRequest, utils.ClientError(err))
+			return
+		default:
+			c.JSON(consts.StatusInternalServerError, utils.ServerError(err))
+			return
+		}
+	}
+	c.JSON(consts.StatusOK, utils.Ok)
 }
