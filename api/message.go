@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"message-board/model"
@@ -28,7 +27,7 @@ func SendMessage(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.NotLoggedIn))
 	}
 	id := int(getID)
-	fmt.Println(id)
+	//fmt.Println(id)//测试
 	message.UserID = id
 	err = service.SendMessage(message)
 	if err != nil {
@@ -46,8 +45,7 @@ func SendMessage(ctx context.Context, c *app.RequestContext) {
 // 下面都是管理员专属功能
 
 func GetAllMessages(ctx context.Context, c *app.RequestContext) { //获取所有评论
-	handlerID := int(c.GetFloat64("user_id"))             //从上下文中获取用户的id
-	allComments, err := service.GetAllMessages(handlerID) //调用service层的方法，获取所有评论
+	allComments, err := service.GetAllMessages() //调用service层的方法，获取所有评论
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, utils.ServerError(err)) //如果出错，说明是服务器错误，返回500
 		return
@@ -59,7 +57,7 @@ func GetAllMessages(ctx context.Context, c *app.RequestContext) { //获取所有
 	c.JSON(consts.StatusOK, combinedJson) //返回所有评论和状态码
 }
 
-func DeleteMessage(ctx context.Context, c *app.RequestContext) { //管理员专属功能,传入ID以删除评论
+func DeleteMessage(ctx context.Context, c *app.RequestContext) { //管理员和评论发送人可使用,传入ID以删除评论
 	messageID := c.Query("id")
 	handlerID := int(c.GetFloat64("user_id"))
 	if messageID == "" { //如果没有传入ID，那么返回错误，避免下方的转换出错
@@ -67,6 +65,7 @@ func DeleteMessage(ctx context.Context, c *app.RequestContext) { //管理员专�
 		return
 	}
 	intMsgID, err := strconv.ParseInt(messageID, 10, 0)
+	//fmt.Println("api", intMsgID)//测试
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
 		return
@@ -88,17 +87,16 @@ func DeleteMessage(ctx context.Context, c *app.RequestContext) { //管理员专�
 
 func SearchForMessages(ctx context.Context, c *app.RequestContext) { //管理员专属功能
 	searchParams := model.SearchParams{}
-	handlerID := c.GetFloat64("user_id") //从上下文中获取用户的id
-	err := c.BindJSON(&searchParams)     //绑定前端传来的参数
+	err := c.BindJSON(&searchParams) //绑定前端传来的参数
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err)) //参数错误
 		return
 	}
 	comments, err := service.SearchForMessages(searchParams.CommentID, searchParams.Content, searchParams.UserID,
-		searchParams.Username, int(handlerID)) //调用service层的方法，进行查询
+		searchParams.Username) //调用service层的方法，进行查询
 	if err != nil {
 		switch {
-		case errors.Is(err, utils.MissingParam), errors.Is(err, utils.ErrUnauthorized), errors.Is(err, utils.InvalidID), errors.Is(err, utils.CantFindMessage): //参数不足
+		case errors.Is(err, utils.MissingParam), errors.Is(err, utils.InvalidID), errors.Is(err, utils.CantFindMessage): //参数不足
 			c.JSON(consts.StatusBadRequest, utils.ClientError(err))
 		default: //其他错误
 			c.JSON(consts.StatusInternalServerError, utils.ServerError(err))

@@ -15,17 +15,9 @@ func SendMessage(message model.Message) error { //发送评论
 	return nil
 }
 
-func GetAllMessages(handlerID int) ([]model.Message, error) { //获取所有评论
-	var empty []model.Message
-	result, err := auth.CheckPermission(handlerID) //检查用户权限
-	if err != nil {
-		return empty, err
-	}
-	if !result {
-		return empty, utils.ErrUnauthorized //不是管理员，返回错误
-	}
-	var commentList []model.Message         //定义一个空的评论列表
-	commentList, err = dao.GetAllMessages() //调用dao层函数
+func GetAllMessages() ([]model.Message, error) { //获取所有评论
+	var commentList []model.Message          //定义一个空的评论列表
+	commentList, err := dao.GetAllMessages() //调用dao层函数
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +25,27 @@ func GetAllMessages(handlerID int) ([]model.Message, error) { //获取所有评�
 }
 
 func DeleteMessages(msgID int, handlerID int) error { //删除评论
+	messages, err := dao.GetAllMessages() //获取该评论
+	if err != nil {
+		return err
+	}
+	//fmt.Println("sv", messages[0].UserID)//测试
+	for _, message := range messages {
+		if message.ID == msgID { //如果找到了这个评论
+			if message.UserID == handlerID { //如果是评论的作者
+				return dao.DeleteMessage(msgID) //调用dao层函数删除
+			} else { //如果不是评论的作者
+				return utils.ErrUnauthorized //返回错误
+			}
+		}
+	}
+	//下面是管理员删除评论的逻辑
 	result, err := auth.CheckPermission(handlerID) //检查用户权限
 	if err != nil {
 		return err
 	}
-	if !result {
-		return utils.ErrUnauthorized //不是管理员，返回错误
+	if !result { //如果不是管理员
+		return utils.ErrUnauthorized //返回错误
 	}
 	err = dao.DeleteMessage(msgID) //调用dao层函数
 	if err != nil {
@@ -47,15 +54,8 @@ func DeleteMessages(msgID int, handlerID int) error { //删除评论
 	return nil
 }
 
-func SearchForMessages(commentID int, content string, userID int, username string, handlerID int) ([]model.Message, error) { //handlerID是管理员的id
-	result, err := auth.CheckPermission(handlerID) //检查用户权限
-	if err != nil {
-		return nil, err
-	}
-	if !result {
-		return nil, utils.ErrUnauthorized //不是管理员，返回错误
-	}
-	return dao.SearchForMessages(commentID, content, userID, username) //是管理员，调用dao层函数
+func SearchForMessages(commentID int, content string, userID int, username string) ([]model.Message, error) { //handlerID是管理员的id
+	return dao.SearchForMessages(commentID, content, userID, username) //调用dao层函数
 }
 
 func LikeMessage(messageID int, handlerID int) error {

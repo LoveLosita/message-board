@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/golang-jwt/jwt/v4"
 	"message-board/utils"
@@ -16,7 +15,7 @@ func JWTAuthMiddleware() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		// 从请求头中获取 Authorization 字段
 		tokenString := c.GetHeader("Authorization")
-		fmt.Println(string(tokenString))
+		//fmt.Println(string(tokenString))//测试用
 		if string(tokenString) == "" { //没有token
 			c.JSON(http.StatusUnauthorized, utils.ClientError(utils.MissingToken))
 			c.Abort() // 中断后续流程
@@ -42,7 +41,7 @@ func JWTAuthMiddleware() app.HandlerFunc {
 		// 将解析出的用户信息存入上下文，供后续使用
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("user_id", claims["user_id"])
-			fmt.Printf("%T", claims["user_id"]) //测试用
+			//fmt.Printf("%T", claims["user_id"]) //测试用
 			//fmt.Println("Claims:", claims) // 打印出所有解析到的 claims//测试用
 		} else {
 			c.JSON(http.StatusUnauthorized, map[string]string{
