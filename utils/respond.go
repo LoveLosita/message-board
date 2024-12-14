@@ -29,6 +29,8 @@ var (
 	NotLoggedIn               = errors.New("not logged in")                                     //未登录
 	ErrUnauthorized           = errors.New("unauthorized: only admins can perform this action") //未授权：只有管理员可以执行此操作
 	SameInfoAsBefore          = errors.New("the new info is the same as before")                //要修改的新信息与原信息相同
+	SamePassword              = errors.New("the new password is the same as before")            //新密码与原密码相同
+	WrongOldPassword          = errors.New("wrong old password")                                //旧密码错误
 )
 
 func ServerError(err error) Response { //服务器错误

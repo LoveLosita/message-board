@@ -150,3 +150,23 @@ func DeleteUser(ctx context.Context, c *app.RequestContext) { //后期再添加�
 	}
 	c.JSON(consts.StatusOK, utils.Ok) //返回成功
 }
+
+func ChangePassword(ctx context.Context, c *app.RequestContext) {
+	jsonUser := model.UpdatePwdUser{}
+	err := c.BindJSON(&jsonUser) //解析json
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
+		return
+	}
+	err = service.ChangeUserPassword(jsonUser.UserName, jsonUser.OldPassWord, jsonUser.NewPassWord) //调用service层的方法，修改密码
+	if err != nil {
+		switch {
+		case errors.Is(err, utils.WrongOldPassword), errors.Is(err, utils.SamePassword): //旧密码错误，新密码与原密码相同
+			c.JSON(consts.StatusBadRequest, utils.ClientError(err)) //返回客户端错误
+		default:
+			c.JSON(consts.StatusInternalServerError, utils.ServerError(err))
+		}
+		return
+	}
+	c.JSON(consts.StatusOK, utils.Ok)
+}

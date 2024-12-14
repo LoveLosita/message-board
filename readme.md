@@ -31,6 +31,11 @@
 ## (6)一些辅助函数(utils)
 封装一些重复使用的变量和函数。  
 `response.go`:<br>封装了一些重复使用的变量(例如成功，失败等)，还有一些包含自定义消息的成功和失败消息(例如自定义成功和失败消息)。
+## (7)中间件(middleware)
+`jwt_checker.go`:<br>检查token是否有效的中间件。
+## (8)认证服务(auth)
+`checkPremission.go`:<br>检测用户是否有权限的服务。
+`jwt_generage.go`:<br>生成jwt的服务。
 # 3.如何部署
 请先确保本地有go环境并安装了git，创建了仓库。(如果你不想使用git，下载zip然后直接在IDE中打开也是可以的，这样的话，请你跳过第一步)
 1. 克隆项目到本地:`git clone https://github.com/LoveLosita/message-board.git`

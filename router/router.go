@@ -11,8 +11,9 @@ func RegisterRouters() {
 
 	userGroup := h.Group("/user") //创建用户组
 
-	userGroup.POST("/login", api.UserLogin)       //user->login //checked
-	userGroup.POST("/register", api.UserRegister) //user->register //checked
+	userGroup.POST("/login", api.UserLogin)                //user->login //checked
+	userGroup.POST("/register", api.UserRegister)          //user->register //checked
+	userGroup.POST("/change_password", api.ChangePassword) //user->change_password
 
 	messageGroup := h.Group("/message") //创建留言组
 

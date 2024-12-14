@@ -8,12 +8,12 @@ import (
 )
 
 func UserLogin(username string, password string) (int, bool, error) {
-	daoUser, err := dao.GetUserInfoByName(username)
+	userid, truePassword, err := dao.GetUserPasswordByName(username)
 	if err != nil { //找不到用户名或者内部错误
 		return 0, false, err
 	}
-	if password == daoUser.PassWord {
-		return daoUser.ID, true, nil
+	if password == truePassword {
+		return userid, true, nil
 	} else {
 		return 0, false, nil //密码错误
 	}
@@ -37,8 +37,8 @@ func UserRegister(user model.User) error {
 	return nil
 }
 
-func ShowUserInfo(userName string, userID int, handlerID int) (model.User, error) { //用户名和用户ID二选一，优先使用用户名
-	var emptyUser model.User
+func ShowUserInfo(userName string, userID int, handlerID int) (model.DisplayUser, error) { //用户名和用户ID二选一，优先使用用户名
+	var emptyUser model.DisplayUser
 	result, err := auth.CheckPermission(handlerID) //检查用户权限
 	if err != nil {
 		return emptyUser, err
@@ -73,18 +73,11 @@ func ChangeUserInfo(handlerID int, user model.NewUser) error {
 	if err != nil {
 		return err
 	}
-	if currentUser.UserName == user.UserName || currentUser.NickName == user.NickName || //如果新信息和旧信息相同，那么就不修改
-		currentUser.PassWord == user.PassWord || currentUser.Role == user.Role {
-		return utils.SameInfoAsBefore
-	}
 	if user.UserName == "" { //如果用户名为空，那么就不修改用户名
 		user.UserName = currentUser.UserName
 	}
 	if user.NickName == "" { //如果昵称为空，那么就不修改昵称
 		user.NickName = currentUser.NickName
-	}
-	if user.PassWord == "" { //如果密码为空，那么就不修改密码
-		user.PassWord = currentUser.PassWord
 	}
 	if user.Role == "" { //如果角色为空，那么就不修改角色
 		user.Role = currentUser.Role
@@ -107,6 +100,25 @@ func DeleteUser(userID int, handlerID int) error { //后期再添加的功能
 	err = dao.DeleteUser(userID) //调用dao层的方法，删除用户
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func ChangeUserPassword(userName, oldPassword, newPassword string) error {
+	_, currentPwd, err := dao.GetUserPasswordByName(userName)
+	if err != nil {
+		return err
+	}
+	if currentPwd == newPassword { //新密码与原密码相同
+		return utils.SamePassword
+	}
+	if currentPwd != oldPassword { //旧密码错误
+		return utils.WrongOldPassword
+	} else {
+		err = dao.ChangePassword(userName, newPassword)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
