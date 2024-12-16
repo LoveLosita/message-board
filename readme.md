@@ -34,7 +34,7 @@
 ## (7)中间件(middleware)
 `jwt_checker.go`:<br>检查token是否有效的中间件。
 ## (8)认证服务(auth)
-`checkPremission.go`:<br>检测用户是否有权限的服务。
+`checkPremission.go`:<br>检测用户是否有权限的服务。<br>
 `jwt_generage.go`:<br>生成jwt的服务。
 # 3.如何部署
 请先确保本地有go环境并安装了git，创建了仓库。(如果你不想使用git，下载zip然后直接在IDE中打开也是可以的，这样的话，请你跳过第一步)
