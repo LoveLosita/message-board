@@ -8,7 +8,7 @@ import (
 )
 
 func SendMessage(message model.Message) error { //发送评论
-	err := dao.AddMessage(message) //调用dao层函数
+	err := dao.SendMessage(message) //调用dao层函数
 	if err != nil {
 		return err
 	}
@@ -93,4 +93,30 @@ func DislikeMessage(messageID int, handlerID int) error {
 		return utils.MessageNotLiked //返回错误
 	}
 	return dao.DislikeMessage(messageID, handlerID) //取消点赞
+}
+
+func ReplyMessage(reply model.ReplyMessage) error { //回复评论
+	err := dao.ReplyMessage(reply) //调用dao层函数
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func BuildMessageTree() ([]model.Message, error) { //构建评论树，用于前端展示
+	messages, err := dao.GetAllMessages() //获取所有评论
+	if err != nil {
+		return nil, err
+	}
+	for i := len(messages) - 1; i >= 0; i-- { //从后往前遍历
+		if messages[i].ParentID != nil { //如果有父评论
+			for j := 0; j < i; j++ { //寻找父评论
+				if *messages[i].ParentID == messages[j].ID { //如果找到了父评论
+					messages[j].Replies = append(messages[j].Replies, messages[i]) //将子评论添加到父评论的Replies中
+					break
+				}
+			}
+		}
+	}
+	return messages, nil
 }

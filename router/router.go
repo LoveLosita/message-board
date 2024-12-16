@@ -18,10 +18,11 @@ func RegisterRouters() {
 	messageGroup := h.Group("/message") //创建留言组
 
 	messageGroup.POST("/submit", middleware.JWTAuthMiddleware(), api.SendMessage)       //message->submit //checked
-	messageGroup.POST("/like", middleware.JWTAuthMiddleware(), api.LikeMessage)         //message->like
-	messageGroup.DELETE("/dislike", middleware.JWTAuthMiddleware(), api.DislikeMessage) //message->dislike
+	messageGroup.POST("/like", middleware.JWTAuthMiddleware(), api.LikeMessage)         //message->like //checked
+	messageGroup.DELETE("/dislike", middleware.JWTAuthMiddleware(), api.DislikeMessage) //message->dislike //checked
 	messageGroup.GET("/get-all", api.GetAllMessages)                                    //message->get-all //checked
 	messageGroup.GET("/search", api.SearchForMessages)                                  //message->search //checked
+	messageGroup.POST("/reply", middleware.JWTAuthMiddleware(), api.ReplyMessage)       //message->reply
 
 	adminGroup := h.Group("/admin")                 //创建管理组
 	messageSubGroup := adminGroup.Group("/message") //创建管理->留言组

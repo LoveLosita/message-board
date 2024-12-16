@@ -42,10 +42,8 @@ func SendMessage(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, utils.Ok)
 }
 
-// 下面都是管理员专属功能
-
 func GetAllMessages(ctx context.Context, c *app.RequestContext) { //获取所有评论
-	allComments, err := service.GetAllMessages() //调用service层的方法，获取所有评论
+	allComments, err := service.BuildMessageTree() //调用service层的方法，获取所有评论
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, utils.ServerError(err)) //如果出错，说明是服务器错误，返回500
 		return
@@ -159,5 +157,39 @@ func DislikeMessage(ctx context.Context, c *app.RequestContext) {
 			return
 		}
 	}
+	c.JSON(consts.StatusOK, utils.Ok)
+}
+
+func ReplyMessage(ctx context.Context, c *app.RequestContext) {
+	//首先读取前端传来的参数
+	message := model.ReplyMessage{}
+	err := c.BindJSON(&message)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
+		return
+	}
+	if message.Content == "" { //如果内容为空
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.MissingParam)) //返回错误
+		return
+	}
+	//然后获取用户的id
+	getID := c.GetFloat64("user_id") //从上下文中获取用户的id
+	if getID == 0 {                  //id空白，表示未登录，不过一般在中间件就会被截止了
+		c.JSON(consts.StatusBadRequest, utils.ClientError(utils.NotLoggedIn))
+	}
+	id := int(getID)
+	//然后调用service层的方法
+	message.UserID = id //将用户id赋值给message
+	err = service.ReplyMessage(message)
+	if err != nil {
+		switch {
+		case errors.Is(err, utils.InvalidID), errors.Is(err, utils.CantFindMessage): //如果是ID错误或者找不到留言
+			c.JSON(consts.StatusBadRequest, utils.ClientError(err))
+		default:
+			c.JSON(consts.StatusInternalServerError, utils.ServerError(err)) //其他错误，一般是服务器错误
+		}
+		return
+	}
+	//最后返回成功
 	c.JSON(consts.StatusOK, utils.Ok)
 }
