@@ -20,7 +20,7 @@ func RegisterRouters() {
 	messageGroup.POST("/submit", middleware.JWTAuthMiddleware(), api.SendMessage)       //message->submit //checked
 	messageGroup.POST("/like", middleware.JWTAuthMiddleware(), api.LikeMessage)         //message->like //checked
 	messageGroup.DELETE("/dislike", middleware.JWTAuthMiddleware(), api.DislikeMessage) //message->dislike //checked
-	messageGroup.GET("/get-all", api.GetAllMessages)                                    //message->get-all //checked
+	messageGroup.GET("/get-all", api.UserGetAllMessages)                                //message->get-all //checked
 	messageGroup.GET("/search", api.SearchForMessages)                                  //message->search //checked
 	messageGroup.POST("/reply", middleware.JWTAuthMiddleware(), api.ReplyMessage)       //message->reply
 
@@ -29,10 +29,11 @@ func RegisterRouters() {
 
 	userSubGroup := adminGroup.Group("/user") //创建管理->用户组
 
-	messageSubGroup.DELETE("/delete", middleware.JWTAuthMiddleware(), api.DeleteMessage) //admin->message->delete //checked
-	userSubGroup.GET("/show", middleware.JWTAuthMiddleware(), api.ShowUserInfo)          //admin->user->show //checked
-	userSubGroup.POST("/change", middleware.JWTAuthMiddleware(), api.ChangeUserInfo)     //admin->user->change //checked
-	userSubGroup.DELETE("/delete", middleware.JWTAuthMiddleware(), api.DeleteUser)       //admin->user->delete //checked
+	messageSubGroup.DELETE("/delete", middleware.JWTAuthMiddleware(), api.DeleteMessage)     //admin->message->delete //checked
+	userSubGroup.GET("/show", middleware.JWTAuthMiddleware(), api.ShowUserInfo)              //admin->user->show //checked
+	userSubGroup.POST("/change", middleware.JWTAuthMiddleware(), api.ChangeUserInfo)         //admin->user->change //checked
+	userSubGroup.DELETE("/delete", middleware.JWTAuthMiddleware(), api.DeleteUser)           //admin->user->delete //checked
+	messageSubGroup.GET("/get-all", middleware.JWTAuthMiddleware(), api.AdminGetAllMessages) //admin->message->get-all
 
 	h.Spin()
 

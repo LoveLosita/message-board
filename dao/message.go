@@ -6,16 +6,16 @@ import (
 	"message-board/utils"
 )
 
-func GetAllMessages() ([]model.Message, error) { //获取所有留言
-	var empty []model.Message                                                  //空的返回值
-	var MessageList []model.Message                                            //返回的评论列表 	//单个评论
+func GetAllMessages() ([]model.AdminGetMessage, error) { //获取所有留言
+	var empty []model.AdminGetMessage                                          //空的返回值
+	var MessageList []model.AdminGetMessage                                    //返回的评论列表 	//单个评论
 	query := "SELECT * FROM messages WHERE is_deleted = 0 ORDER BY created_at" //查询语句
 	rows, err := Db.Query(query)                                               //查询结果
 	if err != nil {                                                            //如果查询出错，那么返回空值和错误
 		return empty, err
 	}
 	for rows.Next() { //遍历查询结果
-		var message model.Message // 每次循环创建一个新的实例
+		var message model.AdminGetMessage // 每次循环创建一个新的实例
 		err = rows.Scan(&message.ID, &message.UserID, &message.Content, &message.CreatedAt, &message.UpdatedAt,
 			&message.IsDeleted, &message.ParentID, &message.Likes) //将查询结果赋值给comment
 		if err != nil { //如果遍历出错，那么返回空值和错误
@@ -29,7 +29,7 @@ func GetAllMessages() ([]model.Message, error) { //获取所有留言
 	return MessageList, nil //返回查询结果
 }
 
-func SendMessage(message model.Message) error { //发送留言
+func SendMessage(message model.AdminGetMessage) error { //发送留言
 	query := "SELECT * FROM users WHERE id=?"    //查询语句
 	rows, err := Db.Query(query, message.UserID) //内部错误
 	if err != nil {                              //如果查询出错，那么返回错误
@@ -63,13 +63,13 @@ func DeleteMessage(msgID int) error { //删除留言
 	}
 }
 
-func SearchForMessages(commentID int, content string, userID int, username string) ([]model.Message, error) { //搜索评论
-	var empty []model.Message       //空的返回值
-	var commentList []model.Message //返回的评论列表
-	var comment model.Message       //单个评论
-	var query string                //查询语句
-	var rows *sql.Rows              //查询结果
-	var err error                   //错误
+func SearchForMessages(commentID int, content string, userID int, username string) ([]model.AdminGetMessage, error) { //搜索评论
+	var empty []model.AdminGetMessage       //空的返回值
+	var commentList []model.AdminGetMessage //返回的评论列表
+	var comment model.AdminGetMessage       //单个评论
+	var query string                        //查询语句
+	var rows *sql.Rows                      //查询结果
+	var err error                           //错误
 
 	if commentID != 0 { //首先第一个判断评论id是否为0，如果不为0，那么就是通过评论id查找
 		query = "SELECT * FROM messages WHERE id = ? AND is_deleted = 0"
@@ -180,7 +180,7 @@ func DislikeMessage(messageID int, userID int) error { //取消点赞
 	return nil
 }
 
-func ReplyMessage(message model.ReplyMessage) error {
+func ReplyMessage(message model.MessageReply) error {
 	//首先要保证这个用户存在
 	query := "SELECT * FROM users WHERE id=?"    //查询是否有这个用户
 	rows, err := Db.Query(query, message.UserID) //内部错误

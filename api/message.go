@@ -12,7 +12,7 @@ import (
 )
 
 func SendMessage(ctx context.Context, c *app.RequestContext) {
-	message := model.Message{}
+	message := model.AdminGetMessage{}
 	err := c.BindJSON(&message)
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
@@ -42,8 +42,28 @@ func SendMessage(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, utils.Ok)
 }
 
-func GetAllMessages(ctx context.Context, c *app.RequestContext) { //获取所有评论
-	allComments, err := service.BuildMessageTree() //调用service层的方法，获取所有评论
+func AdminGetAllMessages(ctx context.Context, c *app.RequestContext) { //获取所有评论
+	handlerID := int(c.GetFloat64("user_id"))                    //从上下文中获取用户的id
+	allComments, err := service.AdminBuildMessageTree(handlerID) //调用service层的方法，获取所有评论
+	if err != nil {
+		switch {
+		case errors.Is(err, utils.ErrUnauthorized): //如果是权限错误
+			c.JSON(consts.StatusUnauthorized, utils.ClientError(err)) //返回401
+			return
+		default:
+			c.JSON(consts.StatusInternalServerError, utils.ServerError(err)) //其他错误，返回500
+			return
+		}
+	}
+	combinedJson := map[string]interface{}{ //将所有评论和状态码组合成一个json
+		"messages":     allComments,
+		"respond code": utils.Ok,
+	}
+	c.JSON(consts.StatusOK, combinedJson) //返回所有评论和状态码
+}
+
+func UserGetAllMessages(ctx context.Context, c *app.RequestContext) { //获取所有评论
+	allComments, err := service.UserBuildMessageTree() //调用service层的方法，获取所有评论
 	if err != nil {
 		c.JSON(consts.StatusInternalServerError, utils.ServerError(err)) //如果出错，说明是服务器错误，返回500
 		return
@@ -162,7 +182,7 @@ func DislikeMessage(ctx context.Context, c *app.RequestContext) {
 
 func ReplyMessage(ctx context.Context, c *app.RequestContext) {
 	//首先读取前端传来的参数
-	message := model.ReplyMessage{}
+	message := model.MessageReply{}
 	err := c.BindJSON(&message)
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.ClientError(err))
